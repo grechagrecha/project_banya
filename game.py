@@ -23,9 +23,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.dt = None
 
-        self.debug = None
-        if debug_mode:
-            self.debug = Debug()
+        self.debug = Debug() if debug_mode else None
 
     def update(self):
 
