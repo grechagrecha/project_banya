@@ -18,8 +18,8 @@ class Player(pygame.sprite.Sprite):
         self.speed = PLAYER_SPEED
 
     def move(self, dt):
-        if self.direction:
-            self.direction.normalize()
+        if self.direction.length() > 1:
+            self.direction.normalize_ip()
 
         self.pos += self.direction * self.speed * dt
         self.rect.center = self.pos

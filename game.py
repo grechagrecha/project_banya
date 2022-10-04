@@ -21,28 +21,36 @@ class Game:
         pygame.display.set_caption('project banya')
 
         self.clock = pygame.time.Clock()
+        self.dt = None
 
         self.debug = None
         if debug_mode:
             self.debug = Debug()
 
+    def update(self):
+
+        self.player_sprite.update(self.dt)
+
+        pygame.display.update()
+
+        self.dt = self.clock.tick(self._framerate) / 1000
+
+    def draw(self):
+        self.screen.fill('grey')
+
+        self.player_sprite.draw(self.screen)
+
+        if self.debug:
+            self.debug.show_debug(self.player.direction, self.player.pos)
+
     def run(self):
 
         # Initial dt calculation
-        dt = self.clock.tick(self._framerate) / 1000
+        self.dt = self.clock.tick(self._framerate) / 1000
 
         while True:
             handle_events(self.player)
 
-            self.screen.fill('grey')
+            self.draw()
 
-            self.player_sprite.draw(self.screen)
-
-            self.player_sprite.update(dt)
-
-            if self.debug:
-                self.debug.show_debug(self.player.direction, self.player.pos)
-
-            pygame.display.update()
-
-            dt = self.clock.tick(self._framerate) / 1000
+            self.update()
