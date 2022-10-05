@@ -41,17 +41,17 @@ class Player(pygame.sprite.Sprite):
         self.movement = Movement()
         self.pos = Vector2(*start_pos)
         self.max_speed = PLAYER_SPEED
-        self.velocity = 0
+        self.speed = 0
         self.acceleration = 4
 
     def move(self, dt):
         if self.movement.is_stopped():
-            if self.velocity > 0:
-                self.velocity -= self.acceleration
-        elif self.velocity <= self.max_speed:
-            self.velocity += self.acceleration
+            if self.speed > 0:
+                self.speed -= self.acceleration
+        elif self.speed <= self.max_speed:
+            self.speed += self.acceleration
 
-        self.pos += self.movement.direction * self.velocity * dt
+        self.pos += self.movement.direction * self.speed * dt
         self.rect.center = self.pos
 
     def update(self, dt):
