@@ -7,19 +7,26 @@ from pygame.math import Vector2
 from constants import PLAYER_SPEED
 
 
-class Direction(Vector2):
+class Movement:
     def __init__(self):
         super().__init__()
-        self.last_dir = Vector2()
-        self.stop = False
+        self.direction = Vector2()
+        self.stopped = False
 
-    def set(self, x, y):
+    def __configure_direction(self, x, y):
+        self.direction.update(x, y)
+        if self.direction.magnitude() != 0:
+            self.direction.normalize_ip()
+
+    def set_direction(self, x, y):
         if not (x or y):
-            self.last_dir.update(x, y)
-            self.stop = True
+            self.stopped = True
         else:
-            self.stop = False
-        self.x, self.y = x, y
+            self.__configure_direction(x, y)
+            self.stopped = False
+
+    def is_stopped(self):
+        return self.stopped
 
 
 class Player(pygame.sprite.Sprite):
@@ -31,22 +38,20 @@ class Player(pygame.sprite.Sprite):
         self.image.fill('black')
         self.rect = self.image.get_rect(center=start_pos)
 
-        self.direction = Direction()
+        self.movement = Movement()
         self.pos = Vector2(*start_pos)
         self.max_speed = PLAYER_SPEED
-        self.velocity = 0
-        self.acceleration = 0.1
+        self.speed = 0
+        self.acceleration = 4
 
     def move(self, dt):
-        if self.direction.magnitude() != 0:
-            self.direction.normalize_ip()
-        if self.direction.x or self.direction.y:
-            self.acceleration = 0.5
-        else:
-            self.acceleration = -0.5
+        if self.movement.is_stopped():
+            if self.speed > 0:
+                self.speed -= self.acceleration
+        elif self.speed <= self.max_speed:
+            self.speed += self.acceleration
 
-        self.velocity += self.acceleration
-        self.pos += self.direction * self.velocity * dt
+        self.pos += self.movement.direction * self.speed * dt
         self.rect.center = self.pos
 
     def update(self, dt):
