@@ -39,7 +39,11 @@ class Game:
         self.player_sprite.draw(self.screen)
 
         if self.debug:
-            self.debug.show_debug(self.player.direction, self.player.pos)
+            self.debug.show_debug(
+                self.player.movement.direction,
+                self.player.pos,
+                self.player.movement.speed
+            )
 
     def run(self):
 
@@ -49,6 +53,5 @@ class Game:
         while True:
             handle_events(self.player)
 
-            self.draw()
-
             self.update()
+            self.draw()
