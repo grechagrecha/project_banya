@@ -14,7 +14,9 @@ class Movement:
         self.speed = 0
         self.acceleration = 4
 
-    def __configure_direction(self, x, y):
+    def __configure_direction(self, **kwargs):
+        x, y = kwargs.get('x'), kwargs.get('y')
+
         self.direction.update(x, y)
 
         if self.direction.magnitude() != 0:
@@ -26,7 +28,7 @@ class Movement:
         if not (x or y):
             self.stopped = True
         else:
-            self.__configure_direction(x, y)
+            self.__configure_direction(x=x, y=y)
             self.stopped = False
 
     def __calculate_speed(self):
