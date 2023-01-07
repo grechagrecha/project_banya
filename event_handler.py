@@ -19,6 +19,6 @@ def handle_keys(player):
         sys.exit()
 
     player.movement.set_direction(
-        keys[pygame.K_d] - keys[pygame.K_a],
-        keys[pygame.K_s] - keys[pygame.K_w]
+        x=keys[pygame.K_d] - keys[pygame.K_a],
+        y=keys[pygame.K_s] - keys[pygame.K_w]
     )
