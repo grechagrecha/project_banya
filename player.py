@@ -1,49 +1,66 @@
 import pygame
 
 from pygame.math import Vector2
+from math import copysign, sqrt
 
-from constants import PLAYER_SPEED
+from constants import PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION
 
 
 class Movement:
     def __init__(self):
-        super().__init__()
-        self.direction = Vector2()
-        self.stopped = False
-        self.max_speed = PLAYER_SPEED
-        self.speed = 0
-        self.acceleration = 4
+        self.direction = Vector2(0, 0)
+        self.velocity = Vector2(0, 0)
+        self.moving = False
+        self.max_speed = PLAYER_MAX_SPEED
+        self.acceleration = PLAYER_ACCELERATION
+        self.friction = PLAYER_FRICTION
 
-    def __configure_direction(self, **kwargs):
-        x, y = kwargs.get('x'), kwargs.get('y')
-
-        self.direction.update(x, y)
-
-        if self.direction.magnitude() != 0:
-            self.direction.normalize_ip()
-        if self.is_stopped():
-            pass
+        self.dt = None
 
     def set_direction(self, x=0, y=0):
-        if not (x or y):
-            self.stopped = True
+        # Normalizing vector for diagonal movement
+        if self.direction.magnitude() > 1:
+            self.direction.normalize_ip()
+        self.direction.update(x, y)
+
+        self.moving = True if self.direction else False
+
+    def _calculate_speed(self):
+        if self.direction.x:
+            self.velocity.x += self.acceleration * self.direction.x * self.dt
         else:
-            self.__configure_direction(x=x, y=y)
-            self.stopped = False
+            if self.velocity.x < 0:
+                self.velocity.x += self.friction * self.dt
+            elif self.velocity.x > 0:
+                self.velocity.x -= self.friction * self.dt
 
-    def __calculate_speed(self):
-        if self.is_stopped():
-            if self.speed > 0:
-                self.speed -= self.acceleration
-        elif self.speed <= self.max_speed - self.acceleration:
-            self.speed += self.acceleration
+            if abs(self.velocity.x) < 0.25:
+                self.velocity.x = 0
 
-    def get_pos_shift(self, dt):
-        self.__calculate_speed()
-        return self.direction * self.speed * dt
+        if abs(self.velocity.x) > self.max_speed:
+            self.velocity.x = self.max_speed * copysign(1, self.velocity.x)
 
-    def is_stopped(self):
-        return self.stopped
+        if self.direction.y:
+            self.velocity.y += self.acceleration * self.direction.y * self.dt
+        else:
+            if self.velocity.y < 0:
+                self.velocity.y += self.friction * self.dt
+            elif self.velocity.y > 0:
+                self.velocity.y -= self.friction * self.dt
+
+            if abs(self.velocity.y) < 0.25:
+                self.velocity.y = 0
+
+        if abs(self.velocity.y) > self.max_speed:
+            self.velocity.y = self.max_speed * copysign(1, self.velocity.y)
+
+        if self.velocity.magnitude() > self.max_speed:
+            self.velocity = self.velocity.lerp(self.direction, 0.1)
+
+    def update(self, dt):
+        self.dt = dt
+
+        self._calculate_speed()
 
 
 class Player(pygame.sprite.Sprite):
@@ -59,7 +76,9 @@ class Player(pygame.sprite.Sprite):
         self.pos = Vector2(*start_pos)
 
     def move(self, dt):
-        self.pos += self.movement.get_pos_shift(dt)
+        self.movement.update(dt)
+
+        self.pos += self.movement.velocity
         self.rect.center = self.pos
 
     def update(self, dt):
