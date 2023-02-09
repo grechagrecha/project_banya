@@ -1,7 +1,7 @@
-import pygame
+from math import copysign
 
-from pygame.math import Vector2
-from math import copysign, sqrt
+import pygame
+from pygame import Vector2
 
 from constants import PLAYER_MAX_SPEED, PLAYER_ACCELERATION, PLAYER_FRICTION
 
@@ -63,13 +63,12 @@ class Movement:
         self._calculate_speed()
 
 
-class Player(pygame.sprite.Sprite):
+class Character(pygame.sprite.Sprite):
     def __init__(self, start_pos: tuple, group: pygame.sprite.GroupSingle):
         super().__init__(group)
 
         # initial setup
-        self.image = pygame.Surface((32, 64))
-        self.image.fill('black')
+        self.image = pygame.image.load('assets/character/ker.png')
         self.rect = self.image.get_rect(center=start_pos)
 
         self.movement = Movement()
