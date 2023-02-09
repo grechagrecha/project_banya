@@ -1,7 +1,7 @@
 import pygame
 
 from settings.settings_management import get_resolution, get_framerate
-from player import Player
+from character.character import Character
 from event_handler import EventHandler
 from debug import Debug
 
@@ -14,8 +14,9 @@ class Game:
         self._framerate = get_framerate()
 
         self.player_sprite = pygame.sprite.GroupSingle()
+        self.all_sprites = pygame.sprite.Group()
 
-        self.player = Player((320, 160), self.player_sprite)
+        self.player = Character((320, 160), self.player_sprite)
         self.event_handler = EventHandler(self.player)
 
         self.screen = pygame.display.set_mode(self._resolution)
@@ -28,6 +29,7 @@ class Game:
 
     def update(self):
         self.player_sprite.update(self.dt)
+        self.all_sprites.update(self.dt)
         pygame.display.update()
 
         self.dt = self.clock.tick(self._framerate) / 1000

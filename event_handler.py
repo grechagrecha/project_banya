@@ -1,11 +1,11 @@
 import pygame
 import sys
 
-from player import Player
+from character.character import Character
 
 
 class EventHandler:
-    def __init__(self, player: Player):
+    def __init__(self, player: Character):
         self._keys = pygame.key.get_pressed()
         self._events = pygame.event.get()
         self._player = player
